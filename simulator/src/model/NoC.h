@@ -67,9 +67,9 @@ public:
 #ifdef ENABLE_CREDITCOUTER_VERIFICATION
     void verifyFlowControl();
 #endif
-#ifdef ENABLE_GUI
+
     void guiServer();
-#endif
+
 
 private:
     GlobalResources& globalResources = GlobalResources::getInstance();

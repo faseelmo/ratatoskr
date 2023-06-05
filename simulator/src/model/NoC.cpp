@@ -20,13 +20,17 @@
  * SOFTWARE.
  ******************************************************************************/
 #include <vector>
-
+#include <string>
 #include "NoC.h"
 
 NoC::NoC(sc_module_name nm):context(1), socket(context, ZMQ_REP){
-#ifdef ENABLE_GUI
-    socket.bind ("tcp://*:5555");
-#endif
+
+    std::string base_address = "tcp://*:";
+    std::string port = globalResources.GUI_Port_address;
+    std::string address = base_address + port;
+    socket.bind (address);
+    //socket.bind ("tcp://*:5555"); 
+
     dbid = rep.registerElement("NoC", 0);
     networkParticipants.resize(globalResources.nodes.size());
     flitSignalContainers.resize(globalResources.connections.size() * 2);
@@ -42,9 +46,9 @@ NoC::NoC(sc_module_name nm):context(1), socket(context, ZMQ_REP){
 #ifdef ENABLE_CREDITCOUTER_VERIFICATION
     SC_THREAD(verifyFlowControl);
 #endif
-#ifdef ENABLE_GUI
+
     SC_THREAD(guiServer);
-#endif
+
 }
 
 void NoC::createClocks() {
@@ -144,7 +148,7 @@ void NoC::createLinks(const std::vector<std::unique_ptr<sc_clock>> &clocks) {
     }
 }
 
-#ifdef ENABLE_GUI
+
 void NoC::guiServer(){
     using boost::property_tree::ptree;
 
@@ -201,7 +205,7 @@ void NoC::guiServer(){
         }
     }
 }
-#endif
+
 
 #ifdef ENABLE_CREDITCOUTER_VERIFICATION
 while (1) {

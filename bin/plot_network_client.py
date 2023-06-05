@@ -283,9 +283,15 @@ def main():
     """
     Main Execution Point
     """
+    port_inp = 5555
+    try:
+        port_inp = sys.argv[1]
+    except IndexError:
+        pass
+    
     network_file = '../simulator/config/network.xml'
     try:
-        network_file = sys.argv[1]
+        network_file = sys.argv[2]
     except IndexError:
         pass
     init_script(network_file)
@@ -305,7 +311,9 @@ def main():
     #  Socket to talk to server
     print("Connecting to simulator server")
     socket = context.socket(zmq.REQ)
-    socket.connect("tcp://localhost:5555")
+    port = str(port_inp)
+    host = "localhost"
+    socket.connect("tcp://{}:{}".format(host, port))
    
     for request in range(2000000):
         socket.send_string("Hello")
@@ -329,7 +337,6 @@ def main():
     plt.show()
         
 ###############################################################################
-
 
 if __name__ == "__main__":
     main()

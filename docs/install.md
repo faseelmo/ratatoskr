@@ -32,7 +32,7 @@ make -j3
 sudo make install
 ```
 [fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) ratatoksr repository on github.com  
-clone repository from your own account
+clone repository from your own account and compile the simulator
 ```bash
 cd ~
 git clone https://github.com/YOUR-USERNAME/ratatoskr.git
@@ -97,6 +97,6 @@ Project Settings:
 ```
 ## Compile Flags
 
-- `ENABLE_GUI` enables the zmq forwarding from simulator to gui. Please disable for parallel execution of multiple instances of the simulator, as they block the same port and fail.
+<!--  - `ENABLE_GUI` enables the zmq forwarding from simulator to gui. Please disable for parallel execution of multiple instances of the simulator, as they block the same port and fail.  -->
 - `ENABLE_BUFFER_VC_STATS` enables detailed buffer stats per VC in form of a histogram. Large performance penalty, so disable if not required.
 - `ENABLE_NETRACE` enables netrace mode. Separate mode, requires recompilation for many settings. Only works with config/nt*.xml configuration files.

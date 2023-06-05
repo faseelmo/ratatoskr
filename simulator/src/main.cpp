@@ -47,6 +47,9 @@ int sc_main(int arg_num, char *arg_vec[])
     cout << "This is free software, and you are welcome to redistribute it" << endl;
     cout << "under certain conditions. For details see README file." << endl
          << endl;
+
+    cout << "Some modifications there from IDS..." <<endl << endl;
+    
     sc_report_handler::set_verbosity_level(SC_DEBUG);
     sc_report_handler::set_actions(SC_ID_INSTANCE_EXISTS_, SC_DO_NOTHING); //disable renaming warnings
 
@@ -59,6 +62,11 @@ int sc_main(int arg_num, char *arg_vec[])
     desc.add_options()("simTime", po::value<std::string>()->default_value(""), "Length of simulation");
     desc.add_options()("flitTrace", po::value<bool>()->default_value(false), "Activating flit trace files");
     desc.add_options()("outputDir", po::value<std::string>()->default_value("."), "Output directory of the simulation");
+
+
+    desc.add_options()("GUI_Port_address", po::value<std::string>()->default_value(""), "GUI Port Address: Default value will be taken if there are no inputs provided. Accepted value ranges from 2000 to 65535");
+
+
 #ifdef ENABLE_NETRACE
     desc.add_options()("netraceRegion", po::value<int>()->default_value(2), "Netrace: Region of the simulation, per default the PARSEC's ROI");
     desc.add_options()("netraceTraceFile", po::value<std::string>()->default_value(""), "Netrace: Trace file");
@@ -128,6 +136,12 @@ int sc_main(int arg_num, char *arg_vec[])
         globalResources.netraceVerbosity = 0;
 #endif
 
+        
+    globalResources.GUI_Port_address = vm["GUI_Port_address"].as<std::string>();
+    if (globalResources.GUI_Port_address.empty())
+        globalResources.GUI_Port_address = "5555";
+
+
     // start simulation
     rep.connect("127.0.0.1", "10000");
     rep.startRun("name");
@@ -147,6 +161,7 @@ int sc_main(int arg_num, char *arg_vec[])
         cout << " done." << endl;
     }
     globalReport.reportPerformance(cout);
+
     cout << "Random seed " << globalResources.rd_seed << endl;
 
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t1);
@@ -162,3 +177,4 @@ int sc_main(int arg_num, char *arg_vec[])
 
     return 0;
 }
+

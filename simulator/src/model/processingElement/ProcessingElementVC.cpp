@@ -74,6 +74,9 @@ void ProcessingElementVC::thread()
             if (pair.second<=timeStamp) {
                 Task t = globalResources.tasks.at(dest.destinationTask);
                 Node dstNode = globalResources.nodes.at(t.nodeID);
+
+		cout << "[AGO]  nodeID=" << t.nodeID << "   dest=" << dest.destinationTask << endl;
+		
                 Packet* p = packetFactory.createPacket(this->node, dstNode, globalResources.flitsPerPacket, sc_time_stamp().to_double(),
                         dest.dataType);
                 double time = sc_time_stamp().to_double();
@@ -217,7 +220,11 @@ void ProcessingElementVC::thread()
 
 void ProcessingElementVC::execute(Task& task)
 {
-    if (!taskRepeatLeft.count(task)) {
+
+  cout << "[ProcessingElementVC:execute]   Node" << node.id << endl; 
+    
+
+  if (!taskRepeatLeft.count(task)) {
         taskRepeatLeft[task] = globalResources.getRandomIntBetween(task.minRepeat, task.maxRepeat);
     }
     else {
@@ -260,6 +267,10 @@ void ProcessingElementVC::bind(Connection* con, SignalContainer* sigContIn, Sign
 
 void ProcessingElementVC::receive()
 {
+
+  cout << "[ProcessingElementVC:receive]  Node" << node.id << endl; 
+
+  
     LOG(globalReport.verbose_pe_function_calls,
             "PE" << this->id << "(Node" << node.id << ")\t- receive_data_process()");
 
@@ -274,7 +285,15 @@ void ProcessingElementVC::receive()
             else {
                 receivedData[type] = 1;
             }
-            checkNeed();
+
+	    cout << "[ProcessingElementVC:receive]  Node" << node.id << " total received " <<  receivedData[type] << " of type" << type << endl; 
+
+	    //std::map<dataTypeID_t, std::set<Task>> neededFor;
+	    //std::map<std::pair<Task, dataTypeID_t>, int> neededAmount;
+	    //std::map<Task, std::set<dataTypeID_t>> needs;
+	    
+	    checkNeed();
+	    
             packetFactory.deletePacket(received_packet);
         }
     }
@@ -282,12 +301,36 @@ void ProcessingElementVC::receive()
 
 void ProcessingElementVC::startSending(Task& task)
 {
+
+  cout << "[ProcessingElementVC:startSending]  Node" << node.id << endl; 
+
+  
     float rn = globalResources.getRandomFloatBetween(0, 1);
     int numOfPoss = task.possibilities.size();
     for (unsigned int i = 0; i<numOfPoss; ++i) {
         if (task.possibilities.at(i).probability>rn) {
             std::vector<DataDestination> destVec = task.possibilities.at(i).dataDestinations;
             for (DataDestination& dest : destVec) {
+
+
+	      cout << "[ProcessingElementVC:sending]  Node" << node.id
+		   << " dest.destinationTask = " << dest.destinationTask
+		   << " dest.id = " << dest.id
+		   << " dest.dataType = " << dest.dataType
+		   <<  endl;
+
+	      //DataDestination{dataDestID, typeID, destTaskID, minInterval,       maxInterval};
+ // struct DataDestination {
+ //    dataDestID_t id;
+ //    dataTypeID_t dataType;
+ //    //nodeID_t destinationNode;       //fyi: "task" in XML ??
+ //    taskID_t destinationTask;       //fyi: "task" in XML ??
+ //    int minInterval;                //delay between each sent packet
+ //    int maxInterval;
+
+	      
+		
+	      
                 destToTask[dest] = task;
                 taskToDest[task].insert(dest);
 
@@ -321,7 +364,14 @@ void ProcessingElementVC::checkNeed()
 
         if (neededFor.count(type)) {
             for (const Task& t : neededFor.at(type)) {
+   
                 std::pair<Task, dataTypeID_t> pair = std::make_pair(t, type);
+
+		cout << "[ProcessingElementVC:check]  Node" << node.id <<
+		  " neededAmmount " <<  neededAmount.at(pair) << " of type " << type  <<
+		  " received " << receivedData.at(type) << endl; 
+
+	    
                 neededAmount.at(pair) -= receivedData.at(type);
                 /* This line was commented out because if a task requires several packets from several data types,
                  it says that the task is finished receiving the required packets while in fact, it still needs some packets.
@@ -333,6 +383,10 @@ void ProcessingElementVC::checkNeed()
                     // receivedData.at(type) = -neededAmount.at(pair);
                 }
             }
+
+	    //ago: After all task have decreased their pending amount, we remove the received values
+	    receivedData.at(type) = 0;
+	    
         }
 
         for (auto& p : removeList) {

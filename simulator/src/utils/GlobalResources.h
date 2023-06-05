@@ -70,6 +70,7 @@ public:
     std::string mapping_file;
     std::string netraceFile;
     int netraceStartRegion;
+    std::string GUI_Port_address;
 #ifdef ENABLE_NETRACE
     std::map<nodeID_t, int> netraceNodeToTask;
     std::map<int, nodeID_t> netraceTaskToNode;

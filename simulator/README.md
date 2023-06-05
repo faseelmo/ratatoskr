@@ -4,6 +4,6 @@
 
 enables netrace mode
 
-`cmake -DDEFINE_ENABLE_GUI=ON`
+<!-- `cmake -DDEFINE_ENABLE_GUI=ON`
 
-enables GUI mode
+enables GUI mode -->

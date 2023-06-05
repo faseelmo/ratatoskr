@@ -38,6 +38,10 @@ GlobalResources::GlobalResources()
     auto seed = std::random_device{}();
     rand->seed(seed);
     rd_seed = seed;
+
+    //ago:
+    cout << " [AGO] -------------------------------- FIX seed to ensure repetitivity while debugging" << endl;
+    rd_seed = 1234;
 }
 
 GlobalResources &GlobalResources::getInstance()
@@ -607,7 +611,7 @@ void GlobalResources::readConnections(const pugi::xml_node &noc_node)
 void GlobalResources::readTaskAndMapFiles(const std::string &taskFilePath, const std::string &mappingFilePath)
 {
     std::map<taskID_t, nodeID_t> bindings = readMappingFile(mappingFilePath);
-    readTaskFile(taskFilePath, bindings);
+    readTaskFile(taskFilePath, bindings);    
 }
 
 std::map<taskID_t, nodeID_t> GlobalResources::readMappingFile(const std::string &mappingFilePath)
@@ -623,6 +627,8 @@ std::map<taskID_t, nodeID_t> GlobalResources::readMappingFile(const std::string 
     {
         int taskID = readRequiredIntAttribute(bind_node, "task", "value");
         int nodeID = readRequiredIntAttribute(bind_node, "node", "value");
+	cout << "[readMapping] task= " << taskID << " node= " << nodeID << endl;
+	
         bindings.emplace(taskID, nodeID);
     }
     return bindings;
@@ -645,7 +651,12 @@ void GlobalResources::readTaskFile(const std::string &taskFilePath, const std::m
         std::string name = readRequiredStringAttribute(type_node, "name", "value");
         dataTypes.emplace_back(dataTypeID, name);
     }
+
+    
+    
     // Read Tasks
+    std::vector<Task> unsorted_tasks;
+    
     for (pugi::xml_node task_node : data_node.child("tasks").children("task"))
     {
         taskID_t taskID = task_node.attribute("id").as_int();
@@ -692,14 +703,27 @@ void GlobalResources::readTaskFile(const std::string &taskFilePath, const std::m
                 readAttributeIfExists(destination_node, "delay", "min", dataDestination.minDelay);
                 readAttributeIfExists(destination_node, "delay", "max", dataDestination.maxDelay);
 
+		//ag: Show
+		cout << "[readTaskFile]  from_task " <<  taskID << " to " << destTaskID << "  count_min=" << dataDestination.minCount << endl;
+		
                 destinations.push_back(dataDestination);
             }
             possibilities.emplace_back(possID, probability, destinations);
         }
         task.possibilities = possibilities;
 
-        tasks.push_back(task);
+	//ag: I am not sure if this is right! It main not if order of task is not
+	// same that order of IDs
+        //tasks.push_back(task);
+	unsorted_tasks.push_back(task);
+	
     }
+    //ago: sort the tasks
+    std::sort(unsorted_tasks.begin(), unsorted_tasks.end());
+    tasks = unsorted_tasks ;
+    
+    //tasks.at(task.id)=task; // Insert them in order
+    
 }
 
 std::vector<Node *> GlobalResources::getNodesByPos(const Vec3D<float> &pos)

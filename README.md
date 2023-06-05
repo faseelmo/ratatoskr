@@ -96,30 +96,42 @@ In this part, we'll simulate a NoC for a heterogeneous 3D SoC with two 30nm mixe
 
 ![Heterogeneous Traffic](bin/demo/uniform_hetero_network.gif)
 
-Let's generate this figure. Enter the demo folder and copy the executable and the configuration files:
+The executable `sim` has to be provided with two input XML files namely the network.xml and config.xml files. The config.xml contains the description about the simulation time, flits per packet and the application. The network.xml file contains the topology of the network to be simulated and details about the number of layers, buffer depth type, node types and connections. The `sim`executable on simulation gives the outputs like buffer usuage, virtual channel usage , flit latency, packet latency, simulation time taken etc.
+
+The `sim` can be externally provided with config.xml and network.xml files if the default is not to be used. Also for the multiple simulations with GUI, the `sim` can be provided with different port addresses. The options for these can be obtained by the below command:
 
 ```bash
-cd ~/ratatoskr/bin/demo
+./sim --help
+```
+
+Let's generate this figure. Create a new folder `tutorials` and copy the executable and the required xml configuration files:
+
+```bash
+cd ~/ratatoskr/bin/
+mkdir tutorials
+cd tutorials
 cp ~/ratatoskr/simulator/sim .
 ```
 
-We'll the the python venv and copy the required files for the GUI:
+We'll set the python venv and copy the required files for the GUI:
 
 ```bash
 cd ~/ratatoskr/bin/
 make
 source source_me.sh
-cd ~/ratatoskr/bin/demo
-cp config/network_heterogeneous.xml network.xml #will be read as network config file for plotting.
-python ../plot_network_client.py
+cd ~/ratatoskr/bin/tutorials
+mkdir config
+cp ../demo/config/network_heterogeneous.xml config/network.xml #will be read as network config file for plotting.
+cd ..
+python plot_network_client.py 6000
 ```
 
-The GUI script is started and waits for the simulation to run. Let's open a second terminal, in which you run the simulator:
+The GUI script is started at GUI port address 6000 and waits for the simulation to run. The default value of the port in this python script is same as the default value of port in the ./sim file which is 5000. The python plotting script connects to the server and once simulation is done, a 3D plot for the network provided is displayed in matplotlib. Let's open a second terminal (bin folder), in which you run the simulator providing the same GUI port address:
 
 ```bash
-cp config/config_heterogeneous.xml config/config.xml
-cd ~/ratatoskr/bin/demo
-./sim
+cp demo/config/config_heterogeneous.xml tutorials/config/config.xml
+cd ~/ratatoskr/bin/tutorials
+./sim --GUI_Port_address 6000     (or ./sim --GUI_Port_address=6000)
 ```
 
 ## Different traffic patterns
