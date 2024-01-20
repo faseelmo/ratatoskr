@@ -1,0 +1,3 @@
+/home/rubtpunk/gan_noc/ratatoskr/updated_ratatoskr2/simulator/build/CMakeFiles/rebuild_cache.dir
+/home/rubtpunk/gan_noc/ratatoskr/updated_ratatoskr2/simulator/build/CMakeFiles/edit_cache.dir
+/home/rubtpunk/gan_noc/ratatoskr/updated_ratatoskr2/simulator/build/CMakeFiles/sim.dir

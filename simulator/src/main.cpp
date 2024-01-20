@@ -157,7 +157,7 @@ int sc_main(int arg_num, char *arg_vec[])
     {
         cout << "Generating report of the simulation run into file " << globalResources.outputFileName << " ... " << endl
              << endl;
-        globalReport.reportComplete(globalResources.outputDirectory + "/" + globalResources.outputFileName);
+        globalReport.reportComplete(globalResources.outputDirectory + "/results/" + globalResources.outputFileName);
         cout << " done." << endl;
     }
     globalReport.reportPerformance(cout);
